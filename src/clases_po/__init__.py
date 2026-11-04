@@ -4,4 +4,4 @@ from .regresion_lineal import RegresionLineal
 from .clasificador_text import ClasificadorTexto
 
 
-__all__ = ["HFDatasetLoader", "Reportes", "Regresion_Lineal"]
+__all__ = ["HFDatasetLoader", "Reportes", "Regresion_Lineal", "ClasificadorTexto"]
