@@ -1,6 +1,7 @@
 """Carga datasets de Hugging Face y, opcionalmente, los guarda en disco."""
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 from typing import Literal
 from datasets import load_dataset  
@@ -68,7 +69,16 @@ class HFDatasetLoader:
         if self.max_rows is not None:
             dataset = dataset.select(range(min(self.max_rows, len(dataset))))
 
-        self.df = dataset.to_pandas()
+        # Convert dates to ISO strings before pandas construction. With the
+        # current Python/pandas combination, converting this HF date column
+        # directly through Arrow can terminate the process with an access violation.
+        data = dataset.to_dict()
+        for column, values in data.items():
+            data[column] = [
+                value.isoformat() if isinstance(value, date) else value
+                for value in values
+            ]
+        self.df = pd.DataFrame(data)
         if self.filename is not None:
             self._save(self.df)
         return self.df
